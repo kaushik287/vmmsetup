@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 
 set -euxo pipefail
-
+sudo apt-get update
+sudo apt-get install -y \
+  unzip \
+  gnupg \
+  gpg \
+  curl \
+  wget \
+  lsb-release \
+  software-properties-common
 function install_terraform() {(
   sudo apt-get update
   sudo apt-get install -y \
