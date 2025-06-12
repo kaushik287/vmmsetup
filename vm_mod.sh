@@ -9,7 +9,8 @@ sudo apt-get install -y \
   curl \
   wget \
   lsb-release \
-  software-properties-common
+  software-properties-common \
+  jq
 function install_terraform() {(
   sudo apt-get update
   sudo apt-get install -y \
