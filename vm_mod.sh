@@ -30,6 +30,7 @@ function install_terraform() {(
 
 function install_azcli() {(
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  az extension add --name azure-devops
 )}
 
 install_azcli
