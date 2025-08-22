@@ -4,6 +4,7 @@ set -euxo pipefail
 sudo apt-get update
 sudo apt-get install -y \
   unzip \
+  zip \
   gnupg \
   gpg \
   curl \
@@ -24,6 +25,7 @@ function install_terraform() {(
   sudo apt update
   sudo apt-get install -y terraform
   sudo apt-get install -y unzip
+  sudo apt-get install -y zip
 )}
 
 function install_azcli() {(
