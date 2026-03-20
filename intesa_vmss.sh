@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-# --- Non-interactive to avoid debconf issues ---
+# --- Non-interactive mode (prevents debconf errors) ---
 export DEBIAN_FRONTEND=noninteractive
 
 # --- Clean apt safely ---
 sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/*
 
-# --- Update repos (no need to re-add default repos unless broken) ---
+# --- Update package lists ---
 sudo apt-get update --allow-releaseinfo-change -o Acquire::Retries=5
 
-# --- Install common packages ---
+# --- Install base packages ---
 sudo apt-get install -y \
   unzip \
   zip \
@@ -24,48 +24,58 @@ sudo apt-get install -y \
   jq
 
 # =========================================================
-# 🔹 Install Python (Ubuntu 22.04/24.04 compatible)
+# 🔹 Install Python (Ubuntu 22.04 & 24.04 compatible)
 # =========================================================
-sudo apt-get install -y python3 python3-venv python3-distutils python3-pip
+sudo apt-get install -y \
+  python3 \
+  python3-venv \
+  python3-pip \
+  python3-setuptools
 
-# Make python -> python3
+# Make python -> python3 (optional but useful)
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-# Upgrade pip and install required packages
+# Upgrade pip safely
 python3 -m pip install --upgrade pip
+
+# Install required Python tools
 python3 -m pip install pip-audit==2.10.0
 
 # =========================================================
 
 # --- Function: Install Terraform ---
-function install_terraform() {(
+install_terraform() {
   sudo apt-get update --allow-releaseinfo-change -o Acquire::Retries=5
   sudo apt-get install -y gnupg software-properties-common wget
 
-  # Add HashiCorp repo
+  # Add HashiCorp GPG key
   wget -O- https://apt.releases.hashicorp.com/gpg \
     | gpg --dearmor \
     | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
 
+  # Add HashiCorp repo
   echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
 https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
     | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
   sudo apt-get update --allow-releaseinfo-change -o Acquire::Retries=5
   sudo apt-get install -y terraform unzip zip
-)}
+}
 
 # --- Function: Install Azure CLI ---
-function install_azcli() {(
+install_azcli() {
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-)}
+}
 
-# --- Run installers ---
+# --- Execute installations ---
 install_azcli
 install_terraform
 
 # --- Verify installations ---
+echo "===== Versions ====="
 python --version
-pip3 --version
+python3 -m pip --version
 terraform -version
 az version
+
+echo "===== Setup Completed Successfully ====="
